@@ -47,6 +47,7 @@ PrepareResult process_exit(InputBuffer* input_buffer) {
   if (strncmp(input_buffer->buffer, "exit", 4) == 0) {
     char char_code[4];
     sscanf((input_buffer->buffer) + 4, "%3s", char_code);
+    // atoi ensures that invalid or null characters are defaulted to 0
     int code = atoi(char_code);
     if (code < 0 || code > 255) {
       printf(ANSI_COLOR_RED "Syntax Error: " ANSI_COLOR_RESET "Invalid exit code: %d (0-255)\n", code);

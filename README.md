@@ -21,4 +21,7 @@ Shell written in C heavily inspired yet forked from [Codecrafters](https://app.c
 - [ ] Append `stderr`
 - More later...
 
+# Good practices
+- Implement a testing pipeline
+- Write some units tests for each item in [checklist](#Checklist)
 
