@@ -40,7 +40,9 @@ InputBuffer* new_input_buffer() {
 
 void close_input_buffer(InputBuffer* input_buffer) {
   free(input_buffer->buffer);
+  input_buffer->buffer = NULL;
   free(input_buffer);
+  input_buffer = NULL;
 }
 
 PrepareResult process_exit(InputBuffer* input_buffer) {

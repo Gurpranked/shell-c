@@ -35,6 +35,7 @@ typedef enum { PREPARE_SUCCESS, PREPARE_SYNTAX_ERROR, PREPARE_UNRECOGNIZED_COMMA
 */
 void print_prompt();
 
+
 /*
     Reads from stdin into InputBuffer object
     Arg: (InputBuffer*)
@@ -47,6 +48,7 @@ void print_prompt();
         None
 */
 void read_input(InputBuffer* input_buffer);
+
 
 /*
     Create new InputBuffer object
@@ -61,6 +63,7 @@ void read_input(InputBuffer* input_buffer);
 */
 InputBuffer* new_input_buffer();
 
+
 /*
     Closes input buffer object
     Arg: (required) (InputBuffer*)
@@ -74,13 +77,16 @@ InputBuffer* new_input_buffer();
 */
 void close_input_buffer(InputBuffer* input_buffer);
 
+
 /*
     Builtin exit command 
     (meta) Arg: (optional) status_code (default = 0)
         status_code is a positive integer ranged from 0 to 255
     
     Desc: Reads from InputBuffer object to interpret for exit command
-
+            NOTE: To avoid memory leaks, the provided InputBuffer object is 
+                attempted to be closed on a successful exit command.
+    
     Arg: (InputBuffer*)
         input_buffer
 
@@ -92,3 +98,18 @@ void close_input_buffer(InputBuffer* input_buffer);
     
 */
 PrepareResult process_exit(InputBuffer* input_buffer);
+
+
+/*
+    Builtin echo command
+    (meta) Arg: (optional) text (default = '\n')
+        text is a null-terminated char array
+
+    Desc: Prints command argument to stdout
+            NOTE: Does NOT support options
+    returns:
+        PREPARE_UNRECOGNIZED_STATEMENT
+        PREPARE_SUCCESS
+
+*/
+PrepareResult process_echo(InputBuffer* input_buffer);
