@@ -62,3 +62,75 @@ PrepareResult process_exit(InputBuffer* input_buffer) {
     return PREPARE_UNRECOGNIZED_COMMAND;
   }
 }
+
+int is_command(char* command) {
+  for(int i = 0; i < CMD_LIST_SIZE; i++) {
+    if (strcmp(command, cmd_list[i]) == 0) {
+      return i;
+    }
+    else if(strcmp(command, cmd_list[i]) < 0) {
+      return -1;
+    }
+  }
+  return -1;
+}
+
+void process_type(InputBuffer* input_buffer) {
+  if (strncmp(input_buffer->buffer, "type", 4) == 0) {
+    char* rest = input_buffer->buffer;
+    char* arg = strtok_r(input_buffer->buffer, " ", &rest);
+    int cmd_int;
+    while (arg != NULL) {
+      cmd_int = is_command(arg);
+      switch(cmd_int){
+        case 0:
+          fprintf(stdout, "%s\n")
+      } 
+
+      // Get next argument
+      arg = strtok_r(NULL, " ", &rest);
+    }
+  }
+}
+
+
+int tokenize(char* input, char ***tokens) {  
+  int argc = 0;
+  // Get the first token
+  char* rest = input;
+  char* token = strtok_r(input, " ", &rest);
+
+  // Get the rest of the tokens
+  while (token != NULL) {
+    (*tokens)[argc++] = token;
+    token = strtok_r(NULL, " ", &rest);
+  }
+
+  return argc;
+}
+
+
+void spawn_child(InputBuffer* input_buffer) {
+    char* executable_filename = get_executable(input_buffer);
+    
+    // Tokenize to argv for command
+    char*** argv;
+    int argc = tokenize(input_buffer->buffer, argv);
+    pid_t pid = fork();
+    pid_t child_pid;
+
+    if (p<0) {
+      perror("Error: Fork Failed");
+      exit(EXIT_FAILURE);
+    }
+    // Child process
+    else if (p == 0) {
+      // Run command in child process
+      execvp(executable_filename, argv);
+    }
+    else
+      child_pid = wait(NULL);
+
+
+}
+

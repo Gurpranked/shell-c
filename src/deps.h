@@ -10,6 +10,9 @@
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
+// NOTE: Update alongside cmd_list 
+#define CMD_LIST_SIZE 3
+
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
@@ -20,6 +23,8 @@ typedef struct {
 } InputBuffer;
 
 typedef enum { PREPARE_SUCCESS, PREPARE_SYNTAX_ERROR, PREPARE_UNRECOGNIZED_COMMAND } PrepareResult;
+
+const char* cmd_list[] = {"echo", "exit", "type"};
 
 // Declarations
 
@@ -38,7 +43,7 @@ void print_prompt();
 
 /*
     Reads from stdin into InputBuffer object
-    Arg: (InputBuffer*)
+    Arg: (required) InputBuffer*
         input_buffer
     
     Desc: Reads from stdin into the InputBuffer object's buffer. 
@@ -113,3 +118,35 @@ PrepareResult process_exit(InputBuffer* input_buffer);
 
 */
 PrepareResult process_echo(InputBuffer* input_buffer);
+
+
+/*
+    Spawns child process to run programs. 
+    Arg: (required) (InputBuffer*)
+        input_buffer
+    
+    Desc: Spawns a child process to execute the command from the input_buffer
+
+    returns:
+        None
+    
+*/
+void spawn_child(InputBuffer* input_buffer);
+
+
+/*
+    Tokenizes buffer into an argv like array delimited 
+    Arg: (char*) (char***)
+        input
+        tokens
+    
+    Desc: Tokenizes a character array into an argv like array of strings. 
+
+    returns: (int)
+        argc
+*/
+int tokenize(char* input, char*** tokens);
+
+void process_type(InputBuffer* input_buffer);
+
+int is_command(char* command);

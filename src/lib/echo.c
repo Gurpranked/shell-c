@@ -1,19 +1,4 @@
-#include <stdio.h>
-#include <sys/types.h>
-#include <stdbool.h>
-#include <ctype.h>
-#include <assert.h>
-#include "deps.h"
-
-#define PROGRAM_NAME "echo"
-#define VERSION "0.01"
-#define AUTHORS "Brain Fox, Chet Ramey and Gurpreet Singh"
-#define FALLTHROUGH 1
-enum { COPYRIGHT_YEAR = 2025 };
-
-void usage(int status);
-void version_etc(FILE *stream, const char *command_name, const char *authors, const char *version);
-static int hextodec(unsigned char c);
+#include "echo.h"
 
 static int
 hextodec (unsigned char c){
@@ -29,7 +14,7 @@ hextodec (unsigned char c){
 }
 
 
-int main(int argc, char **argv) {
+int echo(int argc, char **argv) {
     bool display_return = true;
 
     if (argc == 2) {
@@ -109,18 +94,22 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
+int main(int argc, char **argv) {
+    return echo(argc, argv);
+}
+
 void usage(int status) {
     printf("\
         Usage: %s [STRING]...\n\
            or: %s [HELP] \n\
            ", PROGRAM_NAME, PROGRAM_NAME);
     fputs("\
-        Echo the STRING(s) to standard output.\n", stdout);
+Echo the STRING(s) to standard output.\n", stdout);
     exit(status);
 }
 
 void version_etc(FILE *stream, const char *command_name, const char *authors, const char *version) {
-    fprintf(stream, "%s (%s)\n", command_name, version);
-    fprintf(stream, "(C) %d\n", COPYRIGHT_YEAR);
-    fprintf(stream, authors, "\n");
+    fprintf(stream, "%s (v%s)\n", command_name, version);
+    fprintf(stream, "(C) COPYRIGHT %d\n", COPYRIGHT_YEAR);
+    fprintf(stream, authors);
 }
