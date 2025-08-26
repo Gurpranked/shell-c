@@ -10,10 +10,10 @@ Shell written in C heavily inspired yet forked from [Codecrafters](https://app.c
 
 ## Checklist 
 - [x] `exit` builtin
-- [ ] `echo` builtin
+- [x] `echo` builtin
 - [ ] `type` builtin
 - [ ] `pwd` builtin
-- [ ] `cd` builtin
+- [x] `cd` builtin
 - [ ] Run other programs (spawn and manage child processes)
 - [ ] Redirect `stdout`
 - [ ] Redirect `stderr`
