@@ -94,22 +94,20 @@ int echo(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-int main(int argc, char **argv) {
-    return echo(argc, argv);
-}
-
 void usage(int status) {
     printf("\
         Usage: %s [STRING]...\n\
-           or: %s [HELP] \n\
-           ", PROGRAM_NAME, PROGRAM_NAME);
+           or: %s [HELP] \n", PROGRAM_NAME, PROGRAM_NAME);
     fputs("\
-Echo the STRING(s) to standard output.\n", stdout);
+        Echo the STRING(s) to standard output.\n\n", stdout);
+    fputs("\
+        Recognizes escape sequences and quotation closure.\n\
+        More details: https://bash.cyberciti.biz/guide/Quoting\n", stdout);
     exit(status);
 }
 
 void version_etc(FILE *stream, const char *command_name, const char *authors, const char *version) {
     fprintf(stream, "%s (v%s)\n", command_name, version);
     fprintf(stream, "(C) COPYRIGHT %d\n", COPYRIGHT_YEAR);
-    fprintf(stream, authors);
+    fputs(authors, stream);
 }

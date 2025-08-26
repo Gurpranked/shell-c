@@ -1,67 +1,88 @@
 #include "deps.h"
 
+// NOTE: Update alongside cmd_list 
+#define CMD_LIST_SIZE 3
+const char* cmd_list[] = {"echo", "exit", "type"};
+
 int main() {
   // Flush after every printf
   setbuf(stdout, NULL);
-  InputBuffer* input_buffer = new_input_buffer();
+  char* input = NULL;
+  ssize_t bytes_read;
+  size_t len;
+  printf("Shell-C (type `exit` to quit)\n");
 
   while (true) {
     print_prompt();
-    read_input(input_buffer);
-    if (process_exit(input_buffer) == PREPARE_UNRECOGNIZED_COMMAND) {
-      printf(ANSI_COLOR_YELLOW "Unrecognized command: " ANSI_COLOR_RESET "%s\n", input_buffer->buffer);
-    } 
+    bytes_read = getline(&input, &len, stdin);
+    if (bytes_read == -1) {
+      // EOF or error
+      if (feof(stdin))
+        printf("Exiting...");
+      else
+        perror("getline failed");
+      // break out of loop and terminate 
+      break;
+    }
+    int argc;
+    char** argv = tokenize(input, &argc); 
+
+    if (argc > 0) {
+      if (strcmp(argv[0], "exit") == 0) {
+        int code = 0;
+        // Default no argument to exit code 0
+        if (argc == 1) {
+          free_argv(argv);
+          free(input);
+          exit(0);
+        }
+        // Get exit code
+        else {
+          code = atoi(argv[1]);
+        }
+
+        // Validate
+        if (code < 0 || code > 255) {
+          printf(ANSI_COLOR_RED "Syntax Error: " ANSI_COLOR_RESET "Invalid exit code: %d (0-255)\n", code);
+          continue;
+        }
+
+        // Exit
+        free_argv(argv);
+        free(input);
+        exit(code);
+      }
+
+      else if (strcmp(argv[0], "echo") == 0) {
+        echo(argc, argv);
+      } 
+
+      else if (strcmp(argv[0], "type") == 0) {
+        printf(ANSI_COLOR_MAGENTA "type has not yet been implemented" ANSI_COLOR_RESET "\n");
+      }
+
+      else if (strcmp(argv[0], "cd") == 0) {
+        printf(ANSI_COLOR_MAGENTA "cd has not yet been implemented" ANSI_COLOR_RESET "\n");
+      }
+
+      else if (strcmp(argv[0], "pwd") == 0) {
+        printf(ANSI_COLOR_MAGENTA "pwd has not yet been implemented" ANSI_COLOR_RESET "\n");
+      }
+
+      // Unrecognized command
+      else {
+        printf(ANSI_COLOR_YELLOW "Unrecognized command: " ANSI_COLOR_RESET "%s\n", argv[0]);
+      }
+    }
+    next:
+    // Memory cleanup
+    free_argv(argv);   
   }
-  close_input_buffer(input_buffer);
-	return 0;
+	free(input);
+  return 0;
 }
 
 void print_prompt() { printf("$ "); }
-
-void read_input(InputBuffer* input_buffer) {
-  ssize_t bytes_read = getline(&(input_buffer->buffer), &(input_buffer->buffer_length), stdin);
-  if (bytes_read <= 0) {
-    printf("Error reading input\n");
-    exit(EXIT_FAILURE);
-  }
-
-  // Ignore trailing newline
-  input_buffer->input_length = bytes_read - 1;
-  input_buffer->buffer[bytes_read - 1] = 0;
-}
-
-InputBuffer* new_input_buffer() {
-  InputBuffer* input_buffer = (InputBuffer*) malloc(sizeof(InputBuffer));
-  input_buffer->buffer = NULL;
-  input_buffer->buffer_length = 0;
-  input_buffer->input_length = 0;
-  return input_buffer;
-}
-
-void close_input_buffer(InputBuffer* input_buffer) {
-  free(input_buffer->buffer);
-  input_buffer->buffer = NULL;
-  free(input_buffer);
-  input_buffer = NULL;
-}
-
-PrepareResult process_exit(InputBuffer* input_buffer) {
-  if (strncmp(input_buffer->buffer, "exit", 4) == 0) {
-    char char_code[4];
-    sscanf((input_buffer->buffer) + 4, "%3s", char_code);
-    // atoi ensures that invalid or null characters are defaulted to 0
-    int code = atoi(char_code);
-    if (code < 0 || code > 255) {
-      printf(ANSI_COLOR_RED "Syntax Error: " ANSI_COLOR_RESET "Invalid exit code: %d (0-255)\n", code);
-      return PREPARE_SYNTAX_ERROR;
-    }
-    close_input_buffer(input_buffer);
-    exit(code);
-  }
-  else {
-    return PREPARE_UNRECOGNIZED_COMMAND;
-  }
-}
 
 int is_command(char* command) {
   for(int i = 0; i < CMD_LIST_SIZE; i++) {
@@ -69,68 +90,129 @@ int is_command(char* command) {
       return i;
     }
     else if(strcmp(command, cmd_list[i]) < 0) {
-      return -1;
+      return PREPARE_UNRECOGNIZED_COMMAND;
     }
   }
-  return -1;
+  return PREPARE_UNRECOGNIZED_COMMAND;
 }
 
-void process_type(InputBuffer* input_buffer) {
-  if (strncmp(input_buffer->buffer, "type", 4) == 0) {
-    char* rest = input_buffer->buffer;
-    char* arg = strtok_r(input_buffer->buffer, " ", &rest);
-    int cmd_int;
-    while (arg != NULL) {
-      cmd_int = is_command(arg);
-      switch(cmd_int){
-        case 0:
-          fprintf(stdout, "%s\n")
-      } 
+// void process_type(InputBuffer* input_buffer) {
+//   if (strncmp(input_buffer->buffer, "type", 4) == 0) {
+//     char* rest = input_buffer->buffer;
+//     char* arg = strtok_r(input_buffer->buffer, " ", &rest);
+//     int cmd_int;
+//     while (arg != NULL) {
+//       cmd_int = is_command(arg);
+//       switch(cmd_int){
+//         case 0:
+//           fprintf(stdout, "%s\n")
+//       } 
 
-      // Get next argument
-      arg = strtok_r(NULL, " ", &rest);
-    }
+//       // Get next argument
+//       arg = strtok_r(NULL, " ", &rest);
+//     }
+//   }
+// }
+
+
+void free_argv(char** argv) {
+  if (argv == NULL) {
+    return;
   }
+
+  for (int i = 0; argv[i] != NULL; i++) {
+    free(argv[i]);
+  }
+  free(argv);
 }
 
+char** tokenize(char* input, int* argc) {  
+  if (input == NULL || *input == '\0') {
+    *argc = 0;
+    return NULL;
+  }
 
-int tokenize(char* input, char ***tokens) {  
-  int argc = 0;
-  // Get the first token
-  char* rest = input;
-  char* token = strtok_r(input, " ", &rest);
+  // Temp copy of input to tokenize
+  char* input_copy = strdup(input);
+  if (input_copy == NULL) {
+    perror("strdup failed");
+    exit(EXIT_FAILURE);
+  } 
 
-  // Get the rest of the tokens
+  // Calculate argc
+  char* temp_input = input_copy;
+  char* token = strtok(temp_input, " \t\n");
+  int count = 0;
   while (token != NULL) {
-    (*tokens)[argc++] = token;
-    token = strtok_r(NULL, " ", &rest);
+    count++;
+    token = strtok(NULL, " \t\n");
   }
 
-  return argc;
-}
+  // Allocate memory for argv
+  char** argv = (char**)malloc(sizeof(char*) * (count + 1));
+  if (argv == NULL) {
+    perror("malloc failed");
+    free(input_copy);
+    exit(EXIT_FAILURE);
+  }
 
 
-void spawn_child(InputBuffer* input_buffer) {
-    char* executable_filename = get_executable(input_buffer);
-    
-    // Tokenize to argv for command
-    char*** argv;
-    int argc = tokenize(input_buffer->buffer, argv);
-    pid_t pid = fork();
-    pid_t child_pid;
+  // Reset strtok and tokenize original string
+  free(input_copy);
+  input_copy = strdup(input);
+  if (input_copy == NULL) {
+    perror("strdup failed");
+    exit(EXIT_FAILURE);
+  }
 
-    if (p<0) {
-      perror("Error: Fork Failed");
+  int i = 0;
+  token = strtok(input_copy, " \t\n");
+  while (token != NULL) {
+    argv[i] = strdup(token);
+    if (argv[i] == NULL) {
+      perror("strdup failed");
+      // clean already allocated memory
+      for (int j = 0; j < i; j++) 
+        free(argv[j]);
+      free(argv);
+      free(input_copy);
       exit(EXIT_FAILURE);
     }
-    // Child process
-    else if (p == 0) {
-      // Run command in child process
-      execvp(executable_filename, argv);
-    }
-    else
-      child_pid = wait(NULL);
-
-
+    i++;
+    token = strtok(NULL, " \t\n");
+  }
+  argv[i] = NULL;
+  *argc = count;
+  
+  free(input_copy);
+  return argv;
 }
 
+
+int spawn_child(int argc, char** argv) {
+    pid_t p = fork();
+    pid_t child_pid;
+
+    // Fork failed
+    if (p<0) {
+      perror("Error: Fork Failed");
+      return PREPARE_FAILURE; 
+    }
+    // Child proc
+    else if (p == 0) {
+      // Run command in child process
+      execvp(argv[0], argv);
+      // In case the parent process execution fails the exec call
+      perror("Exec failed");
+      exit(EXIT_FAILURE);
+    }
+    // Parent proc
+    else { 
+      int status;
+      int child_pid = waitpid(p, &status, 0);
+      // Return child process exit status
+      if (WIFEXITED(status)) {
+        return WEXITSTATUS(status);
+      }
+    }
+}

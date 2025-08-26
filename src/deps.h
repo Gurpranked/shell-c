@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -10,21 +14,15 @@
 #define ANSI_COLOR_CYAN    "\x1b[36m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-// NOTE: Update alongside cmd_list 
-#define CMD_LIST_SIZE 3
-
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 
 typedef struct {
-    char* buffer;
-    size_t buffer_length;
-    ssize_t input_length;
+    char** argv;
+    int argc;
 } InputBuffer;
 
-typedef enum { PREPARE_SUCCESS, PREPARE_SYNTAX_ERROR, PREPARE_UNRECOGNIZED_COMMAND } PrepareResult;
-
-const char* cmd_list[] = {"echo", "exit", "type"};
+typedef enum { PREPARE_SUCCESS, PREPARE_FAILURE, PREPARE_SYNTAX_ERROR, PREPARE_UNRECOGNIZED_COMMAND = -1 } PrepareResult;
 
 // Declarations
 
@@ -107,18 +105,16 @@ PrepareResult process_exit(InputBuffer* input_buffer);
 
 /*
     Builtin echo command
-    (meta) Arg: (optional) text (default = '\n')
-        text is a null-terminated char array
-
+    Args: (required) int, (required) char**
+        int argc, char** argv
+        Just as the arguments produced by the OS ABI in C
+    
     Desc: Prints command argument to stdout
             NOTE: Does NOT support options
-    returns:
-        PREPARE_UNRECOGNIZED_STATEMENT
-        PREPARE_SUCCESS
-
+    returns: int
+        EXIT_SUCCESS
 */
-PrepareResult process_echo(InputBuffer* input_buffer);
-
+int echo(int argc, char **argv);
 
 /*
     Spawns child process to run programs. 
@@ -127,26 +123,28 @@ PrepareResult process_echo(InputBuffer* input_buffer);
     
     Desc: Spawns a child process to execute the command from the input_buffer
 
-    returns:
-        None
+    returns: int
+        process exit status OR process creation error code
     
 */
-void spawn_child(InputBuffer* input_buffer);
+int spawn_child(int argc, char** argv);
 
 
 /*
     Tokenizes buffer into an argv like array delimited 
-    Arg: (char*) (char***)
+    Arg: (char*) 
         input
-        tokens
     
     Desc: Tokenizes a character array into an argv like array of strings. 
 
-    returns: (int)
-        argc
+    returns: (char**)
+        argv
 */
-int tokenize(char* input, char*** tokens);
+char** tokenize(char* input, int* argc);
 
 void process_type(InputBuffer* input_buffer);
 
 int is_command(char* command);
+
+
+void free_argv(char** argv);
