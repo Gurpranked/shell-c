@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <pwd.h>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -16,6 +17,8 @@
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
+
+#define MAX_PATH_LENGTH 4096
 
 typedef struct {
     char** argv;

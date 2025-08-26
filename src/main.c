@@ -2,11 +2,16 @@
 
 // NOTE: Update alongside cmd_list 
 #define CMD_LIST_SIZE 3
-const char* cmd_list[] = {"echo", "exit", "type"};
+const char* cmd_list[] = {"echo", "exit", "type", "cd", "pwd"};
+const char* homedir;
 
 int main() {
   // Flush after every printf
   setbuf(stdout, NULL);
+
+  if ((homedir = getenv("HOME")) == NULL)
+    homedir = getpwuid(getuid())->pw_dir;
+
   char* input = NULL;
   ssize_t bytes_read;
   size_t len;
@@ -62,7 +67,17 @@ int main() {
       }
 
       else if (strcmp(argv[0], "cd") == 0) {
-        printf(ANSI_COLOR_MAGENTA "cd has not yet been implemented" ANSI_COLOR_RESET "\n");
+        if (argc == 1) {
+          if (chdir(homedir) != 0) 
+            printf(ANSI_COLOR_YELLOW "Error: " ANSI_COLOR_RESET "Invalid Path\n");
+        }
+        else if (argv[1][0] == '~') {
+          if (chdir(homedir) != 0) 
+            printf(ANSI_COLOR_YELLOW "Error: " ANSI_COLOR_RESET "Invalid Path\n");
+        }
+        else if (chdir(argv[1]) != 0) {
+          printf(ANSI_COLOR_YELLOW "Error: " ANSI_COLOR_RESET "Invalid Path\n");
+        }
       }
 
       else if (strcmp(argv[0], "pwd") == 0) {
@@ -82,7 +97,19 @@ int main() {
   return 0;
 }
 
-void print_prompt() { printf("$ "); }
+void print_prompt() { 
+  char cwd[MAX_PATH_LENGTH];
+  getcwd(cwd, sizeof(cwd));
+  if (strcmp(cwd, homedir) == 0) {
+    printf(ANSI_COLOR_BLUE "~ $ " ANSI_COLOR_RESET); 
+    return;
+  }
+  char* folderName = strrchr(cwd, '/');
+  if (folderName != NULL){
+    folderName++; // Move past the '/'
+  }
+  printf(ANSI_COLOR_BLUE "(%s) $ " ANSI_COLOR_RESET, folderName); 
+}
 
 int is_command(char* command) {
   for(int i = 0; i < CMD_LIST_SIZE; i++) {
