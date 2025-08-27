@@ -4,6 +4,8 @@
 #define CMD_LIST_SIZE 3
 const char* cmd_list[] = {"echo", "exit", "type", "cd", "pwd"};
 const char* homedir;
+char cwd[MAX_PATH_LENGTH];
+
 
 int main() {
   // Flush after every printf
@@ -81,7 +83,8 @@ int main() {
       }
 
       else if (strcmp(argv[0], "pwd") == 0) {
-        printf(ANSI_COLOR_MAGENTA "pwd has not yet been implemented" ANSI_COLOR_RESET "\n");
+        getcwd(cwd, sizeof(cwd));
+        printf("%s\n", cwd);
       }
 
       // Unrecognized command
@@ -98,7 +101,6 @@ int main() {
 }
 
 void print_prompt() { 
-  char cwd[MAX_PATH_LENGTH];
   getcwd(cwd, sizeof(cwd));
   if (strcmp(cwd, homedir) == 0) {
     printf(ANSI_COLOR_BLUE "~ $ " ANSI_COLOR_RESET); 
