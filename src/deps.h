@@ -20,11 +20,6 @@
 
 #define MAX_PATH_LENGTH 4096
 
-typedef struct {
-    char** argv;
-    int argc;
-} InputBuffer;
-
 typedef enum { PREPARE_SUCCESS, PREPARE_FAILURE, PREPARE_SYNTAX_ERROR, PREPARE_UNRECOGNIZED_COMMAND = -1 } PrepareResult;
 
 // Declarations

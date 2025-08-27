@@ -84,7 +84,7 @@ int main() {
 
       else if (strcmp(argv[0], "pwd") == 0) {
         getcwd(cwd, sizeof(cwd));
-        printf("%s\n", cwd);
+        printf("Physical Path: %s\n", cwd);
       }
 
       // Unrecognized command

@@ -12,7 +12,7 @@ Shell written in C heavily inspired yet forked from [Codecrafters](https://app.c
 - [x] `exit` builtin
 - [x] `echo` builtin
 - [ ] `type` builtin
-- [ ] `pwd` builtin
+- [x] `pwd` builtin
 - [x] `cd` builtin
 - [ ] Run other programs (spawn and manage child processes)
 - [ ] Redirect `stdout`
