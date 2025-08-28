@@ -3,6 +3,7 @@
 // NOTE: Update alongside cmd_list 
 #define CMD_LIST_SIZE 3
 const char* cmd_list[] = {"echo", "exit", "type", "cd", "pwd"};
+
 const char* homedir;
 char cwd[MAX_PATH_LENGTH];
 
@@ -35,6 +36,7 @@ int main() {
     char** argv = tokenize(input, &argc); 
 
     if (argc > 0) {
+      // exit
       if (strcmp(argv[0], "exit") == 0) {
         int code = 0;
         // Default no argument to exit code 0
@@ -60,14 +62,17 @@ int main() {
         exit(code);
       }
 
+      // echo
       else if (strcmp(argv[0], "echo") == 0) {
         echo(argc, argv);
       } 
 
+      // type
       else if (strcmp(argv[0], "type") == 0) {
         printf(ANSI_COLOR_MAGENTA "type has not yet been implemented" ANSI_COLOR_RESET "\n");
       }
-
+      
+      // cd
       else if (strcmp(argv[0], "cd") == 0) {
         if (argc == 1) {
           if (chdir(homedir) != 0) 
@@ -82,11 +87,12 @@ int main() {
         }
       }
 
+      // pwd
       else if (strcmp(argv[0], "pwd") == 0) {
         getcwd(cwd, sizeof(cwd));
         printf("Physical Path: %s\n", cwd);
       }
-
+      
       // Unrecognized command
       else {
         printf(ANSI_COLOR_YELLOW "Unrecognized command: " ANSI_COLOR_RESET "%s\n", argv[0]);
@@ -233,6 +239,7 @@ int spawn_child(int argc, char** argv) {
       execvp(argv[0], argv);
       // In case the parent process execution fails the exec call
       perror("Exec failed");
+      free_argv(argv);
       exit(EXIT_FAILURE);
     }
     // Parent proc

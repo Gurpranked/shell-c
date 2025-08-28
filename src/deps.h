@@ -109,6 +109,7 @@ PrepareResult process_exit(InputBuffer* input_buffer);
     
     Desc: Prints command argument to stdout
             NOTE: Does NOT support options
+
     returns: int
         EXIT_SUCCESS
 */
@@ -140,9 +141,32 @@ int spawn_child(int argc, char** argv);
 */
 char** tokenize(char* input, int* argc);
 
-void process_type(InputBuffer* input_buffer);
+/*
+   Determines if the provided string represents a valid command 
+   Arg: (char*)
+        command
+    
+    Desc: Determines if the provided string represents a valid command recognized by the shell
 
+    returns: (int)
+        Index of command in cmd_list list
+        OR
+        PREPARE_UNRECOGNIZED_COMMAND
+*/
 int is_command(char* command);
 
+int is_alias(char* command);
 
+int is_keyword(char* input);
+
+/*
+    Frees the previously allocated argv array from memory
+    Arg: (char**)
+        argv
+    
+    Desc: Deallocates argv array from memory. If null, does nothing
+    
+    returns: (void)
+        None
+*/
 void free_argv(char** argv);
