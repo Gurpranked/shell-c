@@ -1,12 +1,8 @@
 #include "deps.h"
 
 // NOTE: Update alongside cmd_list 
-#define CMD_LIST_SIZE 3
+#define CMD_LIST_SIZE 5
 const char* cmd_list[] = {"echo", "exit", "type", "cd", "pwd"};
-
-const char* homedir;
-char cwd[MAX_PATH_LENGTH];
-
 
 int main() {
   // Flush after every printf
@@ -69,22 +65,26 @@ int main() {
 
       // type
       else if (strcmp(argv[0], "type") == 0) {
-        printf(ANSI_COLOR_MAGENTA "type has not yet been implemented" ANSI_COLOR_RESET "\n");
         if (argc > 1) {
-          if (is_alias(argv[1])) {
-            printf("%s is a shell alias\n", argv[0]);
-          }
-          else if (is_keyword(argv[1])) {
-            printf("%s is a shell keyword\n", argv[0]);
-          }
-          else if (is_function(argv[1])) {
-            printf("%s is a shell function\n", argv[0]);
-          } 
-          else if (is_builtin(argv[1])) {
-            printf("%s is a shell bulltin\n", argv[0]);
-          }
-          else if (is_executable(argv[1])) {
-            printf("%s is an executable program\n", argv[0]);
+          for (int i = 1; i < argc; i++) {
+            if (is_alias(argv[1])) {
+              printf("%s is a shell alias\n", argv[1]);
+            }
+            else if (is_keyword(argv[1])) {
+              printf("%s is a shell keyword\n", argv[1]);
+            }
+            else if (is_function(argv[1])) {
+              printf("%s is a shell function\n", argv[1]);
+            } 
+            else if (is_builtin(argv[1])) {
+              printf("%s is a shell builtin\n", argv[1]);
+            }
+            else if (is_executable(argv[1])) {
+              printf("%s is an executable program\n", argv[1]);
+            }
+            else {
+              printf(ANSI_COLOR_RED "Unrecognized command: " ANSI_COLOR_RESET "%s\n", argv[1]);
+            }
           }
         } 
         else {
@@ -111,7 +111,7 @@ int main() {
       // pwd
       else if (strcmp(argv[0], "pwd") == 0) {
         getcwd(cwd, sizeof(cwd));
-        printf("Physical Path: %s\n", cwd);
+        printf("%s\n", cwd);
       }
       
       // Unrecognized command
@@ -143,32 +143,12 @@ void print_prompt() {
 int is_builtin(char* input) {
   for(int i = 0; i < CMD_LIST_SIZE; i++) {
     if (strcmp(input, cmd_list[i]) == 0) {
-      return i;
+      return 1; 
     }
-    else if(strcmp(input, cmd_list[i]) < 0) {
-      return PREPARE_UNRECOGNIZED_COMMAND;
-    }
-  }
-  return PREPARE_UNRECOGNIZED_COMMAND;
+   }
+  
+  return 0; 
 }
-
-// void process_type(InputBuffer* input_buffer) {
-//   if (strncmp(input_buffer->buffer, "type", 4) == 0) {
-//     char* rest = input_buffer->buffer;
-//     char* arg = strtok_r(input_buffer->buffer, " ", &rest);
-//     int cmd_int;
-//     while (arg != NULL) {
-//       cmd_int = is_command(arg);
-//       switch(cmd_int){
-//         case 0:
-//           fprintf(stdout, "%s\n")
-//       } 
-
-//       // Get next argument
-//       arg = strtok_r(NULL, " ", &rest);
-//     }
-//   }
-// }
 
 
 void free_argv(char** argv) {

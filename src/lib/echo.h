@@ -1,6 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
 #include <stdbool.h>
 #include <ctype.h>
-#include "../deps.h"
 
 #define PROGRAM_NAME "echo"
 #define VERSION "9.7 + 0.01"

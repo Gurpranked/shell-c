@@ -22,6 +22,9 @@
 
 typedef enum { PREPARE_SUCCESS, PREPARE_FAILURE, PREPARE_SYNTAX_ERROR, PREPARE_UNRECOGNIZED_COMMAND = -1 } PrepareResult;
 
+const char* homedir;
+char cwd[MAX_PATH_LENGTH];
+
 // Declarations
 
 /*
@@ -35,71 +38,6 @@ typedef enum { PREPARE_SUCCESS, PREPARE_FAILURE, PREPARE_SYNTAX_ERROR, PREPARE_U
         None
 */
 void print_prompt();
-
-
-/*
-    Reads from stdin into InputBuffer object
-    Arg: (required) InputBuffer*
-        input_buffer
-    
-    Desc: Reads from stdin into the InputBuffer object's buffer. 
-            Updates input_length field.
-    
-    returns:
-        None
-*/
-void read_input(InputBuffer* input_buffer);
-
-
-/*
-    Create new InputBuffer object
-    Arg: 
-        None
-    
-    Desc: Allocates a new InputBuffer object with default NULL buffer,
-            input_lenth of 0, and buffer_length of 0.
-    
-    returns:
-        InputBuffer*
-*/
-InputBuffer* new_input_buffer();
-
-
-/*
-    Closes input buffer object
-    Arg: (required) (InputBuffer*)
-        input_buffer
-    
-    Desc: Given InputBuffer object, frees
-            internal buffer and entire object itself from heap
-    
-    returns:
-        None
-*/
-void close_input_buffer(InputBuffer* input_buffer);
-
-
-/*
-    Builtin exit command 
-    (meta) Arg: (optional) status_code (default = 0)
-        status_code is a positive integer ranged from 0 to 255
-    
-    Desc: Reads from InputBuffer object to interpret for exit command
-            NOTE: To avoid memory leaks, the provided InputBuffer object is 
-                attempted to be closed on a successful exit command.
-    
-    Arg: (InputBuffer*)
-        input_buffer
-
-    returns (PrepareResult):
-        PREPARE_SYNTAX_ERROR 
-        PREPARE_UNRECONGIZED_COMMAND
-        OR 
-        Successfully exits
-    
-*/
-PrepareResult process_exit(InputBuffer* input_buffer);
-
 
 /*
     Builtin echo command
