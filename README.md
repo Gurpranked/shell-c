@@ -25,3 +25,5 @@ Shell written in C heavily inspired yet forked from [Codecrafters](https://app.c
 - Implement a testing pipeline
 - Write some units tests for each item in [checklist](#Checklist)
 
+# References
+[coreutils](https://github.com/coreutils/coreutils)

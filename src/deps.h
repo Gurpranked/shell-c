@@ -142,22 +142,29 @@ int spawn_child(int argc, char** argv);
 char** tokenize(char* input, int* argc);
 
 /*
-   Determines if the provided string represents a valid command 
+   Determines if the provided string represents a valid builtin command 
    Arg: (char*)
         command
     
-    Desc: Determines if the provided string represents a valid command recognized by the shell
+    Desc: Determines if the provided string represents a valid builtin command recognized by the shell
 
     returns: (int)
         Index of command in cmd_list list
         OR
         PREPARE_UNRECOGNIZED_COMMAND
 */
-int is_command(char* command);
+int is_builtin(char* input);
 
-int is_alias(char* command);
 
-int is_keyword(char* input);
+// TODO
+// Stub functions
+int is_alias(char* input) { return 0; }
+
+int is_keyword(char* input) { return 0; }
+
+int is_function(char* input) { return 0; }
+
+int is_executable(char* input) { return 0; }
 
 /*
     Frees the previously allocated argv array from memory

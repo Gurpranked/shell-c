@@ -14,3 +14,15 @@ As per traditional shell design, each command is offloaded to a separate child p
 
 # Future feature needs
 Need a hash map implementation to **quickly** lookup commands or determine if a command is valid. Can provide major performance benefits if the tokenization can short-circuit for an unrecognized command.
+
+# type command
+Possible types (in-order of precedence):
+- alias - Hash map like lookup for alias command
+- keyword (`if`, `for`)
+- function
+- shell builtin - use `cmd_list` list with linear check
+- executable
+
+# File System navigation and checking
+Use the `access()` with `X_OK` flag to check for existence and execute permissions. 
+

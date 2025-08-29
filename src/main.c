@@ -70,6 +70,27 @@ int main() {
       // type
       else if (strcmp(argv[0], "type") == 0) {
         printf(ANSI_COLOR_MAGENTA "type has not yet been implemented" ANSI_COLOR_RESET "\n");
+        if (argc > 1) {
+          if (is_alias(argv[1])) {
+            printf("%s is a shell alias\n", argv[0]);
+          }
+          else if (is_keyword(argv[1])) {
+            printf("%s is a shell keyword\n", argv[0]);
+          }
+          else if (is_function(argv[1])) {
+            printf("%s is a shell function\n", argv[0]);
+          } 
+          else if (is_builtin(argv[1])) {
+            printf("%s is a shell bulltin\n", argv[0]);
+          }
+          else if (is_executable(argv[1])) {
+            printf("%s is an executable program\n", argv[0]);
+          }
+        } 
+        else {
+          printf(ANSI_COLOR_RED "Syntax error: " ANSI_COLOR_RESET "Invalid arguments\n");
+          printf("\tUsage: type COMMAND_NAME\n");
+        }
       }
       
       // cd
@@ -119,12 +140,12 @@ void print_prompt() {
   printf(ANSI_COLOR_BLUE "(%s) $ " ANSI_COLOR_RESET, folderName); 
 }
 
-int is_command(char* command) {
+int is_builtin(char* input) {
   for(int i = 0; i < CMD_LIST_SIZE; i++) {
-    if (strcmp(command, cmd_list[i]) == 0) {
+    if (strcmp(input, cmd_list[i]) == 0) {
       return i;
     }
-    else if(strcmp(command, cmd_list[i]) < 0) {
+    else if(strcmp(input, cmd_list[i]) < 0) {
       return PREPARE_UNRECOGNIZED_COMMAND;
     }
   }
